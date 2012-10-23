@@ -4,12 +4,9 @@ namespace ApptSimpleAuth;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
+
 use Zend\Loader\AutoloaderFactory;
 use Zend\Loader\StandardAutoloader;
-
-use Zend\Mvc\MvcEvent;
-use Zend\ModuleManager\ModuleManager;
-use Zend\ModuleManager\ModuleEvent;
 
 class Module implements
     AutoloaderProviderInterface,
