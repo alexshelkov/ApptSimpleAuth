@@ -1,0 +1,17 @@
+ApptSimpleAuth\Rule:
+  type: document
+  collection: rules
+  fields:
+    id:
+      id: true
+    action:
+      type: boolean
+    name:
+      type: string
+  referenceOne:
+    role:
+      targetDocument: SimpleAcl\Role
+      cascade: [all]
+    resource:
+      targetDocument: SimpleAcl\Resource
+      cascade: [all]

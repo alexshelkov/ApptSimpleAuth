@@ -1,0 +1,11 @@
+ApptSimpleAuth\Acl:
+  type: document
+  collection: acls
+  fields:
+    name:
+      id: true
+      strategy: NONE
+  referenceMany:
+    rules:
+      targetDocument: ApptSimpleAuth\Rule
+      cascade: [all]

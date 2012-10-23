@@ -1,0 +1,88 @@
+{
+    "hash": "7e798e656f0cc27e61aeef54849129bc",
+    "packages": [
+        {
+            "package": "alexshelkov/simpleacl",
+            "version": "dev-master",
+            "source-reference": "a46cd2daa552d785d52d766b439c25576b89c42a",
+            "commit-date": "1350831998"
+        },
+        {
+            "package": "doctrine/common",
+            "version": "dev-master",
+            "alias-pretty-version": "2.4.x-dev",
+            "alias-version": "2.4.9999999.9999999-dev"
+        },
+        {
+            "package": "doctrine/common",
+            "version": "dev-master",
+            "source-reference": "20cb487a5809a42f03020c89fa09eb4458de827f",
+            "commit-date": "1350491397"
+        },
+        {
+            "package": "doctrine/data-fixtures",
+            "version": "v1.0.0-ALPHA3"
+        },
+        {
+            "package": "doctrine/doctrine-module",
+            "version": "0.5.2"
+        },
+        {
+            "package": "doctrine/doctrine-mongo-odm-module",
+            "version": "dev-master",
+            "source-reference": "578240984409bb693dabab00ecfdae7460a99ff8",
+            "commit-date": "1350060172"
+        },
+        {
+            "package": "doctrine/mongodb",
+            "version": "dev-master",
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
+        },
+        {
+            "package": "doctrine/mongodb",
+            "version": "dev-master",
+            "source-reference": "27f5d6fa6cbf9bbfaa2c56c5618ffc26476fc399",
+            "commit-date": "1348955973"
+        },
+        {
+            "package": "doctrine/mongodb-odm",
+            "version": "dev-master",
+            "source-reference": "1.0.0-BETA6",
+            "commit-date": "1350073959"
+        },
+        {
+            "package": "symfony/console",
+            "version": "2.1.x-dev",
+            "source-reference": "b52c747c551d8d71c02e17853c8f637d8d5e9cef",
+            "commit-date": "1350717030"
+        },
+        {
+            "package": "symfony/yaml",
+            "version": "2.1.x-dev",
+            "source-reference": "d6894417bffb3298852ffaa202922254b7571666",
+            "commit-date": "1350717030"
+        },
+        {
+            "package": "zendframework/zendframework",
+            "version": "dev-master",
+            "alias-pretty-version": "2.0.x-dev",
+            "alias-version": "2.0.9999999.9999999-dev"
+        },
+        {
+            "package": "zendframework/zendframework",
+            "version": "dev-master",
+            "source-reference": "0e70e048a402fe73fd6ff51613d47fa8b6589c63",
+            "commit-date": "1350509831"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "alexshelkov/simpleacl": 20,
+        "doctrine/doctrine-mongo-odm-module": 20
+    }
+}

@@ -1,0 +1,13 @@
+ApptSimpleAuth\User:
+  type: document
+  collection: users
+  fields:
+    email:
+      id: true
+      strategy: NONE
+    password:
+      type: string
+  referenceMany:
+    objects:
+      targetDocument: SimpleAcl\Role
+      cascade: [all]
