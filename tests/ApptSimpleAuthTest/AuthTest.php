@@ -37,8 +37,12 @@ class AuthTest extends DoctrineModuleTest
 
         $odm->flush();
 
+        $odm->detach($registeredUser);
+
         $result = $auth->authenticate();
 
         $this->assertTrue($result->isValid());
+
+        $this->assertEquals($auth->getIdentity()->getEmail(), $registeredUser->getEmail());
     }
 }
