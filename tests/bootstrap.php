@@ -3,6 +3,10 @@ $applicationRoot = __DIR__ . '/../';
 
 chdir($applicationRoot);
 
+exec('rm -Rf cache');
+exec('mkdir -p cache/doctrine/proxy cache/doctrine/hydrator');
+exec('chmod -R a+w cache');
+
 // Init composer autoloaders
 $loader = require_once __DIR__ . '/../vendor/autoload.php';
 $loader->add('ApptSimpleAuthTest\\', __DIR__ );
