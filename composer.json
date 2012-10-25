@@ -17,5 +17,10 @@
         "alexshelkov/simpleacl": "dev-master",
         "doctrine/doctrine-mongo-odm-module": "dev-master"
     },
+    "autoload": {
+        "psr-0": {
+            "ApptSimpleAuth": "src/"
+        }
+    },
     "minimum-stability": "dev"
 }
