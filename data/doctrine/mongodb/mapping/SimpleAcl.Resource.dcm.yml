@@ -1,4 +1,0 @@
-SimpleAcl\Resource:
-  type: document
-  inheritanceType: COLLECTION_PER_CLASS
-  collection: resources

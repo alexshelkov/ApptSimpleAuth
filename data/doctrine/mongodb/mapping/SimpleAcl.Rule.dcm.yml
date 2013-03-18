@@ -1,0 +1,20 @@
+SimpleAcl\Rule:
+  type: document
+  collection: rules
+  fields:
+    id:
+      id: true
+      strategy: NONE
+    action:
+      type: boolean
+    name:
+      type: string
+  referenceOne:
+    role:
+      simple: true
+      targetDocument: ApptSimpleAuth\Acl\Role
+      cascade: [persist]
+    resource:
+      simple: true
+      targetDocument: ApptSimpleAuth\Acl\Resource
+      cascade: [persist]

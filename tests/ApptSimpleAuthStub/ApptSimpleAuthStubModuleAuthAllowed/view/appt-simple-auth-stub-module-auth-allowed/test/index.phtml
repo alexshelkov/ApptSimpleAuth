@@ -1,0 +1,10 @@
+<?php
+$c = \ApptSimpleAuthStubModuleAuthAllowed\Controller\TestController::$allowed;
+$m = \ApptSimpleAuthStubModuleAuthAllowed\Module::$allowed;
+$c = $c();
+$m = $m();
+?>
+
+\ApptSimpleAuthStubModuleAuthAllowed\Controller\TestController: <?php echo is_bool($c) ? ($c ? "true" : "false") : $c; ?>
+
+\ApptSimpleAuthStubModuleAuthAllowed\Module: <?php echo is_bool($m) ? ($m ? "true" : "false") : $m; ?>

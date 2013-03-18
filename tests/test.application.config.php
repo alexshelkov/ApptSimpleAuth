@@ -3,7 +3,7 @@ return array(
     'modules' => array(
         'DoctrineModule',
         'DoctrineMongoODMModule',
-        'ApptSimpleAuth'
+        'ApptSimpleAuth',
     ),
     'module_listener_options' => array(
         'config_glob_paths'    => array(
@@ -11,7 +11,7 @@ return array(
         ),
         'module_paths' => array(
             'ApptSimpleAuth' => '.',
-            'vendor'
+            'vendor',
         ),
     ),
 );

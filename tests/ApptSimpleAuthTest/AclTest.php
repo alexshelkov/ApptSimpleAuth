@@ -1,154 +1,91 @@
 <?php
 namespace ApptSimpleAuthTest;
 
-use DoctrineMongoODMModuleTest\AbstractTest as DoctrineModuleTest;
+use PHPUnit_Framework_TestCase;
 
+use Zend\Crypt\Password\Bcrypt;
 use ApptSimpleAuth\Acl;
+use ApptSimpleAuth\Acl\Role;
+use ApptSimpleAuth\Acl\Resource;
+use SimpleAcl\Rule;
 
-use SimpleAcl\Role;
-use SimpleAcl\Resource;
-use ApptSimpleAuth\Rule;
+use Zend\Permissions\Acl\Role\GenericRole as ZendRole;
+use Zend\Permissions\Acl\Resource\GenericResource as ZendResource;
 
-use ApptSimpleAuth\User;
-
-class AclTest extends DoctrineModuleTest
+class AclTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @return Acl
-     */
-    public function getAclService()
+    public function testAclName()
     {
-        return $this->serviceManager->get('appt.simple_auth.acl');
+        $acl = new Acl('test_acl');
+
+        $this->assertEquals('test_acl', $acl->getName());
     }
 
-    public function testEmptyAcl()
+    public function testAclRemoveAllRules()
     {
-        $acl = $this->getAclService();
+        $acl = new Acl('test_acl');
 
-        $this->assertFalse($acl->isAllowed('Role', 'Resource', 'Rule'));
+        $role = new Role('test_role');
+        $resource = new Resource('test_resource');
 
-        $acl->addRule(new Role('Role'), new Resource('Resource'), new Rule('Rule'), true);
+        $rule1 = new Rule('test_rule_1');
+        $rule2 = new Rule('test_rule_2');
+        $rule3 = new Rule('test_rule_3');
 
-        $this->assertTrue($acl->isAllowed('Role', 'Resource', 'Rule'));
+        $acl->addRule($role, $resource, $rule1, true);
+        $acl->addRule($role, $resource, $rule2, true);
+        $acl->addRule($role, $resource, $rule3, true);
+
+        $this->assertSame($rule1, $acl->hasRule($rule1));
+        $this->assertSame($rule2, $acl->hasRule($rule2));
+        $this->assertSame($rule3, $acl->hasRule($rule3));
 
         $acl->removeAllRules();
 
-        $this->assertFalse($acl->isAllowed('Role', 'Resource', 'Rule'));
+        $this->assertFalse($acl->hasRule($rule1));
+        $this->assertFalse($acl->hasRule($rule2));
+        $this->assertFalse($acl->hasRule($rule3));
     }
 
-    public function testSaveAcl()
+    public function testZendCapability()
     {
-        /** @var \Doctrine\ODM\MongoDB\DocumentManager $odm */
-        $odm = $this->getDocumentManager();
+        $acl = new Acl('test_acl');
 
-        $acl = $this->getAclService();
+        $role = new Role('test_role');
+        $resource = new Resource('test_resource');
 
-        $odm->persist($acl);
+        $rule1 = new Rule('test_rule_1');
 
-        $odm->flush();
+        $acl->addRule($role, $resource, $rule1, true);
 
-        $odm->detach($acl);
+        $this->assertFalse($acl->isAllowed());
+        $this->assertFalse($acl->isAllowed(null, null, 'test_rule_1'));
+        $this->assertFalse($acl->isAllowed('test_role', 'test_resource'));
 
-        /** @var Acl $aclFind */
-        $aclFind = $odm->find(get_class($acl), $acl->getName());
-
-        $this->assertSame($aclFind->getName(), $acl->getName());
+        $this->assertTrue($acl->isAllowed(new ZendRole('test_role'), new ZendResource('test_resource'), 'test_rule_1'));
     }
 
-    public function testSaveAclWithRules()
+    public function testZendCapabilityHasResource()
     {
-        /** @var \Doctrine\ODM\MongoDB\DocumentManager $odm */
-        $odm = $this->getDocumentManager();
+        $acl = new Acl('test_acl');
 
-        $acl = $this->getAclService();
+        $role = new Role('test_role');
+        $resource = new Resource('test_resource');
 
-        $acl->addRule(new Role('Role'), new Resource('Resource'), new Rule('Rule'), true);
+        $resourceParent = new Resource('test_resource_parent');
+        $resourceChild = new Resource('test_resource_child');
+        $resourceParent->addChild($resourceChild);
 
-        $odm->persist($acl);
+        $acl->addRule($role, $resource, 'test_rule_1', true);
+        $acl->addRule($role, $resourceParent, 'test_rule_2', true);
 
-        $odm->flush();
+        $this->assertFalse($acl->hasResource('unknown_resource'));
+        $this->assertFalse($acl->hasResource(new ZendResource('unknown_resource')));
 
-        $odm->detach($acl);
+        $this->assertTrue($acl->hasResource('test_resource'));
+        $this->assertTrue($acl->hasResource(new ZendResource('test_resource')));
 
-        /** @var Acl $acl */
-        $acl = $odm->find(get_class($acl), $acl->getName());
-
-        $this->assertTrue($acl->isAllowed('Role', 'Resource', 'Rule'));
-    }
-
-    public function testSaveUserAsRoleAggregate()
-    {
-        /** @var \Doctrine\ODM\MongoDB\DocumentManager $odm */
-        $odm = $this->getDocumentManager();
-
-        $user = new User();
-
-        $user->setEmail('test@test.ru');
-
-        $viewer = new Role('Viewer');
-        $editor = new Role('Editor');
-        $submitter = new Role('Submitter');
-
-        $roles = array('Viewer' => $viewer, 'Editor' => $editor, 'Submitter' => $submitter);
-
-        $user->setRoles($roles);
-
-        $odm->persist($user);
-
-        $odm->flush();
-
-        $odm->detach($user);
-
-        /** @var User $user */
-        $user = $odm->find(get_class($user), $user->getEmail());
-
-        $findRoles = array();
-        foreach ( $user->getRoles() as $role) {
-            $findRoles[] = $role->getName();
-        }
-
-        $this->assertEquals(array_keys($roles), $findRoles);
-    }
-
-    public function testSaveAclWithSavedUser()
-    {
-        /** @var \Doctrine\ODM\MongoDB\DocumentManager $odm */
-        $odm = $this->getDocumentManager();
-
-        $user = new User();
-
-        $user->setEmail('test@test.ru');
-
-        $viewer = new Role('Viewer');
-        $editor = new Role('Editor');
-        $submitter = new Role('Submitter');
-
-        $user->setRoles(array($viewer, $editor, $submitter));
-
-        $odm->persist($user);
-
-        $acl = $this->getAclService();
-
-        $page = new Resource('Page');
-        $acl->addRule($viewer, $page, new Rule('View'), true);
-        $acl->addRule($editor, $page, new Rule('Edit'), true);
-        $acl->addRule($submitter, $page, new Rule('Submit'), true);
-
-        $odm->persist($acl);
-
-        $odm->flush();
-
-        $odm->detach($acl);
-        $odm->detach($user);
-
-        /** @var Acl $acl */
-        $acl = $odm->find(get_class($acl), $acl->getName());
-
-        $user = $odm->find(get_class($user), $user->getEmail());
-
-        $this->assertTrue($acl->isAllowed($user, 'Page', 'View'));
-        $this->assertTrue($acl->isAllowed($user, 'Page', 'Edit'));
-        $this->assertTrue($acl->isAllowed($user, 'Page', 'Submit'));
+        $this->assertTrue($acl->hasResource('test_resource_parent'));
+        $this->assertTrue($acl->hasResource('test_resource_child'));
     }
 }
-

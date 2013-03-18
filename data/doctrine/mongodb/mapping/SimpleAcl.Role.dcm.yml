@@ -1,4 +1,0 @@
-SimpleAcl\Role:
-  type: document
-  inheritanceType: COLLECTION_PER_CLASS
-  collection: roles

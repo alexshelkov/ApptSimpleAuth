@@ -2,12 +2,17 @@ ApptSimpleAuth\User:
   type: document
   collection: users
   fields:
-    email:
+    id:
       id: true
       strategy: NONE
+    email:
+      type: string
+      index:
+        unique: true
     password:
       type: string
   referenceMany:
     objects:
-      targetDocument: SimpleAcl\Role
-      cascade: [all]
+      simple: true
+      targetDocument: ApptSimpleAuth\Acl\Role
+      cascade: [persist]

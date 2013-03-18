@@ -1,10 +1,10 @@
 <?php
 namespace ApptSimpleAuth\Service\Exception;
 
-use InvalidArgumentException as SplInvalidArgumentException;
-use ApptSimpleAuth\Service\Exception\Exception;
+use InvalidArgumentException as SplException;
+use ApptSimpleAuth\Service\Exception\ExceptionInterface as Exception;
 
-class InvalidArgumentException extends SplInvalidArgumentException implements Exception
+class InvalidArgumentException extends SplException implements Exception
 {
 
 }

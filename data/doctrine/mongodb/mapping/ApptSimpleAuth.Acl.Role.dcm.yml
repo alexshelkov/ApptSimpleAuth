@@ -1,0 +1,8 @@
+ApptSimpleAuth\Acl\Role:
+  type: document
+  collection: roles
+  referenceMany:
+    children:
+      simple: true
+      targetDocument: ApptSimpleAuth\Acl\Role
+      cascade: [persist]

@@ -4,7 +4,3 @@ SimpleAcl\Object:
     name:
       id: true
       strategy: NONE
-  referenceOne:
-    parent:
-      targetDocument: SimpleAcl\Object
-      cascade: [all]

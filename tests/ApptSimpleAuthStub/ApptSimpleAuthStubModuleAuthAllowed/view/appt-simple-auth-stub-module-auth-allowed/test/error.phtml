@@ -1,0 +1,40 @@
+<?php
+if ( ! function_exists('message') ) {
+    function message($e) {
+        if ( is_string($e) ) {
+            return $e;
+        } elseif ( is_bool($e) ) {
+            return $e ? "true" : "false";
+        } elseif ($e instanceof \Exception) {
+            return $e->getMessage();
+        }
+    }
+}
+
+$c = \ApptSimpleAuthStubModuleAuthAllowed\Controller\TestController::$allowed;
+$m = \ApptSimpleAuthStubModuleAuthAllowed\Module::$allowed;
+try {
+    $c = $c();
+} catch (\Exception $e) {
+    $c = true;
+}
+try {
+    $m = $m();
+} catch (\Exception $e) {
+    $m = true;
+}
+?>
+
+\ApptSimpleAuthStubModuleAuthAllowed\Controller\TestController: <?php echo message($c); ?>
+
+\ApptSimpleAuthStubModuleAuthAllowed\Module: <?php echo message($m); ?>
+
+Message: <?php echo $this->message; ?>
+
+Exception: <?php echo get_class($this->exception); ?>
+
+Exception message: <?php echo $this->exception->getMessage() ?>
+
+<? if ( method_exists($this->exception, 'getUri') ): ?>
+    Uri: <?php echo $this->exception->getUri() ?>
+<? endif; ?>

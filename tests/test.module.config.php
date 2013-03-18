@@ -5,10 +5,11 @@ return array(
             'acl' => array(
                 'name' => 'Test',
                 'class' => 'ApptSimpleAuth\Acl',
-                'document_manager' => 'odm_default'
-            )
-        )
+            ),
+            'documentManager' => 'odm_default'
+        ),
     ),
+
     'doctrine' => array(
         'configuration' => array(
             'odm_default' => array(

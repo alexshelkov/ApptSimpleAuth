@@ -1,8 +1,9 @@
 {
+    "process-timeout": 1000,
     "name": "appt/simpleauth",
     "type": "library",
-    "description": "Integrate SimpleACL with ZF2 and allow authentication.",
-    "keywords": ["ACL", "Zend Framework 2", "Doctrine ODM", "authentication", "authorization"],
+    "description": "Integrate SimpleACL and Doctrine Mongo ODM authorization allowing authorization and authentication for ZF2 applications.",
+    "keywords": ["ACL", "Zend Framework 2", "Doctrine Mongo ODM", "authentication", "authorization"],
     "homepage": "https://github.com/alexshelkov/ApptSimpleAuth",
     "authors": [
         {
@@ -13,14 +14,15 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "ext-mongo": "1.2.*",
         "zendframework/zendframework": "2.*",
-        "alexshelkov/simpleacl": "dev-master",
-        "doctrine/doctrine-mongo-odm-module": "dev-master"
+        "alexshelkov/simpleacl": "2.*",
+        "doctrine/doctrine-mongo-odm-module": "0.*",
+        "symfony/yaml": "2.*"
     },
     "autoload": {
         "psr-0": {
             "ApptSimpleAuth": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

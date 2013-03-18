@@ -7,5 +7,6 @@ ApptSimpleAuth\Acl:
       strategy: NONE
   referenceMany:
     rules:
-      targetDocument: ApptSimpleAuth\Rule
-      cascade: [all]
+      simple: true
+      targetDocument: SimpleAcl\Rule
+      cascade: [persist]

@@ -1,0 +1,7 @@
+<?php echo $this->form()->openTag($this->form); ?>
+<?php echo $this->formInput($this->form->get('user')->get('email')); ?>
+<?php echo $this->formInput($this->form->get('user')->get('password')); ?>
+<?php echo $this->formInput($this->form->get('submit')); ?>
+<?php echo $this->formHidden($this->form->get('csrf')); ?>
+<?php echo $this->formElementErrors($this->form->get('user')->get('auth_error')); ?>
+<?php echo $this->form()->closeTag(); ?>

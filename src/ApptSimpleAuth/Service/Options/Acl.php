@@ -2,6 +2,7 @@
 namespace ApptSimpleAuth\Service\Options;
 
 use Zend\Stdlib\AbstractOptions;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Acl extends AbstractOptions
 {
@@ -14,11 +15,6 @@ class Acl extends AbstractOptions
      * @var string
      */
     protected $class = 'ApptSimpleAuth\Acl';
-
-    /**
-     * @var string
-     */
-    protected $documentManager = 'odm_default';
 
     /**
      * @param string $name
@@ -52,21 +48,16 @@ class Acl extends AbstractOptions
         return $this->class;
     }
 
-    /**
-     * @param string $documentManager
-     */
-    public function setDocumentManager($documentManager)
+    static public function init(ServiceLocatorInterface $serviceLocator)
     {
-        $this->documentManager = $documentManager;
+        $config = $serviceLocator->get('Config');
+
+        if ( isset($config['appt']['simple_auth']['acl']) && is_array($config['appt']['simple_auth']['acl']) ) {
+            $options = $config['appt']['simple_auth']['acl'];
+        } else {
+            $options = array();
+        }
+
+        return new self($options);
     }
-
-    /**
-     * @return string
-     */
-    public function getDocumentManager()
-    {
-        return $this->documentManager;
-    }
-
-
 }

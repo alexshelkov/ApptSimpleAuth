@@ -1,0 +1,8 @@
+ApptSimpleAuth\Acl\Resource:
+  type: document
+  collection: resources
+  referenceMany:
+    children:
+      simple: true
+      targetDocument: ApptSimpleAuth\Acl\Resource
+      cascade: [persist]
