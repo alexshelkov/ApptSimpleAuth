@@ -38,6 +38,6 @@ Exception: <?php echo get_class($this->exception); ?>
 
 Exception message: <?php echo $this->exception->getMessage() ?>
 
-<? if ( method_exists($this->exception, 'getUri') ): ?>
+<?php if ( method_exists($this->exception, 'getUri') ): ?>
 Uri: <?php echo $this->exception->getUri() ?>
-<? endif; ?>
+<?php endif; ?>
