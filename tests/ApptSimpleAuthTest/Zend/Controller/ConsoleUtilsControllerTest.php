@@ -36,7 +36,7 @@ class ConsoleUtilsControllerTest extends AbstractConsoleControllerTestCase
 
     public function testRoleAdd()
     {
-        $this->dispatch('aauth add role test_role --child test_child_role');
+        $this->dispatch('aauth add role test_role --child=test_child_role');
 
         $this->assertMatchedRouteName('appt.simple_auth.role_or_resource_add');
         $this->assertControllerClass('ConsoleUtilsController');
@@ -47,7 +47,7 @@ class ConsoleUtilsControllerTest extends AbstractConsoleControllerTestCase
 
     public function testUserAdd()
     {
-        $this->dispatch('aauth add user test@test.ru test_pass --role test_role');
+        $this->dispatch('aauth add user test@test.ru test_pass --role=test_role');
 
         $this->assertMatchedRouteName('appt.simple_auth.user_add');
         $this->assertControllerClass('ConsoleUtilsController');
@@ -58,7 +58,7 @@ class ConsoleUtilsControllerTest extends AbstractConsoleControllerTestCase
 
     public function testResourceAdd()
     {
-        $this->dispatch('aauth add resource test_resource --child test_child_resource');
+        $this->dispatch('aauth add resource test_resource --child=test_child_resource');
 
         $this->assertMatchedRouteName('appt.simple_auth.role_or_resource_add');
         $this->assertControllerClass('ConsoleUtilsController');
