@@ -4,14 +4,14 @@ namespace ApptSimpleAuthStubModuleAuthAllowed;
 use ApptSimpleAuth\Feature\AuthControlInterface;
 
 use ApptSimpleAuth\AuthService;
-use Zend\Mvc\Router\RouteMatch;
+use Zend\Mvc\MvcEvent;
 
 class Module implements AuthControlInterface
 {
     static public $allowed;
     static public $config = array();
 
-    public function isAuthDenied(AuthService $auth, RouteMatch $routeMatch)
+    public function isAuthDenied(AuthService $auth, MvcEvent $event)
     {
         $allowed = self::$allowed;
         return $allowed();

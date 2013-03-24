@@ -17,11 +17,8 @@ class LoginFactory extends LogoutFactory
         $options = array();
         $options = parent::addDependencies($serviceOptions, $options, $serviceLocator);
 
-        $request = $serviceLocator->get('Request');
-
-        if ( $request instanceof HttpRequest ) {
-            $options['request'] = $request;
-        }
+        $options['request'] = $serviceLocator->get('Request');
+        $options['controller_display_enable'] = $serviceOptions->getLoginControllerDisplayEnable();
 
         return $options;
     }

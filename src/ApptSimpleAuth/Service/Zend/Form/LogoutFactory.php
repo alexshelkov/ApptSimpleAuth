@@ -25,7 +25,6 @@ class LogoutFactory implements FactoryInterface
     {
         $options['auth'] = $serviceLocator->get('appt.simple_auth.auth');
         $options['renderer'] = $serviceLocator->get($serviceOptions->getRenderer());
-        $options['request'] = $serviceLocator->get('request');
         $options['router'] = $serviceLocator->get('router');
 
         $template = "get{$this->getFormName()}Template";

@@ -88,21 +88,25 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
 
     public function testLogoutNotPost()
     {
-        $this->dispatch('aauth/logout/accept');
+        $this->dispatch('/aauth/logout/accept');
         $this->assertResponseStatusCode(404);
     }
 
     public function testLogoutNoCsrf()
     {
-        $this->dispatch('aauth/logout/accept', 'post');
+        $this->dispatch('/aauth/logout/accept', 'post');
         $this->assertResponseStatusCode(403);
     }
 
     public function testLogoutNoParams()
     {
+        $uri = $this->getLogout()->get('success_uri')->getValue();
+
+        $this->assertEmpty($uri);
+
         $csrf = $this->getLogout()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/logout/accept', 'POST', array('csrf' => $csrf));
+        $this->dispatch('/aauth/logout/accept', 'POST', array('csrf' => $csrf, 'success_uri' => $uri));
 
         $this->assertContains("Please setup appt['simple_auth']['forms']['logout']['success_redirect_params']", $this->getResponse()->getContent());
     }
@@ -117,33 +121,45 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
             ),
         );
 
+        $uri = $this->getLogout()->get('success_uri')->getValue();
+
+        $this->assertEmpty($uri);
+
         $csrf = $this->getLogout()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/logout/accept', 'POST', array('csrf' => $csrf));
+        $this->dispatch('/aauth/logout/accept', 'POST', array('csrf' => $csrf, 'success_uri' => $uri));
 
         $this->assertContains("Please setup appt['simple_auth']['forms']['logout']['success_redirect_params']", $this->getResponse()->getContent());
     }
 
     public function testLogoutToUri()
     {
+        $expectedUri = 'http://www.example.com';
+
         Module::$config = array(
             'forms' => array(
                 'logout' => array(
-                    'success_redirect_params' => 'http://www.example.com'
+                    'success_redirect_params' => $expectedUri
                 )
             ),
         );
 
+        $uri = $this->getLogout()->get('success_uri')->getValue();
+
+        $this->assertEquals($expectedUri, $uri);
+
         $csrf = $this->getLogout()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/logout/accept', 'POST', array('csrf' => $csrf));
+        $this->dispatch('/aauth/logout/accept', 'POST', array('csrf' => $csrf, 'success_uri' => $uri));
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'http://www.example.com');
+        $this->assertResponseHeaderContains('Location', $expectedUri);
     }
 
     public function testLogoutToRoute()
     {
+        $expectedUri = 'testLogoutRedirectToRoute';
+
         Module::$config = array(
             'forms' => array(
                 'logout' => array(
@@ -154,23 +170,64 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
             ),
         );
 
+        $uri = $this->getLogout()->get('success_uri')->getValue();
+
+        $this->assertEquals($expectedUri, $uri);
+
         $csrf = $this->getLogout()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/logout/accept', 'POST', array('csrf' => $csrf));
+        $this->dispatch('/aauth/logout/accept', 'POST', array('csrf' => $csrf, 'success_uri' => $uri));
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'testLogoutRedirectToRoute');
+        $this->assertResponseHeaderContains('Location', $expectedUri    );
+    }
+
+    public function testLogoutSetSuccessRedirectUri()
+    {
+        $expectedUri = 'testLogoutSetSuccessRedirectUri';
+
+        $this->getLogout()->setSuccessRedirectUri($expectedUri);
+        $uri = $this->getLogout()->get('success_uri')->getValue();
+
+        $this->assertEquals($expectedUri, $uri);
+
+        $csrf = $this->getLogout()->get('csrf')->getValue();
+
+        $this->dispatch('/aauth/logout/accept', 'POST', array('csrf' => $csrf, 'success_uri' => $uri));
+
+        $this->assertResponseStatusCode(301);
+        $this->assertResponseHeaderContains('Location', $expectedUri);
+    }
+
+    public function testLoginGetRequestDisableControllerDisplay()
+    {
+        $this->dispatch('/aauth/login/accept');
+        $this->assertResponseStatusCode(404);
+
+        $content = $this->getResponse()->getContent();
+
+        $expectedContent = 'Not found';
+
+        $this->assertContains($expectedContent, $content);
     }
 
     public function testLoginGetRequest()
     {
+        Module::$config = array(
+            'forms' => array(
+                'login' => array(
+                    'controller_display_enable' => true
+                )
+            ),
+        );
+
         $csrf = $this->getLogin()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/login/accept');
+        $this->dispatch('/aauth/login/accept');
 
         $content = $this->getResponse()->getContent();
 
-        $expectedContent = '<form action="aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value=""><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
+        $expectedContent = '<form action="/aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value=""><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input name="user[auth_error]" type="hidden" value="0"><input type="hidden" name="success_uri" value=""><input type="hidden" name="fail_uri" value="http:/"><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
 
         $this->assertContains($expectedContent, $content);
     }
@@ -179,27 +236,30 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
     {
         Module::$config = array(
             'forms' => array(
-                'renderer' => 'ViewRenderer'
+                'renderer' => 'ViewRenderer',
+                'login' => array(
+                    'controller_display_enable' => true
+                )
             ),
         );
 
         $csrf = $this->getLogin()->get('csrf')->getValue();
 
-        $this->dispatch('aauth/login/accept?auth-error=fail&email=test');
+        $this->dispatch('/aauth/login/accept?auth-error=fail&email=test');
 
         $content = $this->getResponse()->getContent();
 
-        $expectedContent = '<form action="aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value="test"><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input type="hidden" name="csrf" value="' . $csrf . '"><ul><li>Incorrect email or password provided</li></ul></form>';
+        $expectedContent = '<form action="/aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value="test"><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input name="user[auth_error]" type="hidden" value="fail"><input type="hidden" name="success_uri" value=""><input type="hidden" name="fail_uri" value="http:/"><input type="hidden" name="csrf" value="' . $csrf . '"><ul><li>Incorrect email or password provided</li></ul></form>';
 
         $this->assertContains($expectedContent, $content);
     }
 
     public function testLoginFail()
     {
-        $this->dispatch('aauth/login/accept', 'POST');
+        $this->dispatch('/aauth/login/accept', 'POST', array('fail_uri' => ''));
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'aauth/login/accept?auth-error=fail');
+        $this->assertResponseHeaderContains('Location', '?auth-error=fail');
     }
 
     public function testLoginBadCsrf()
@@ -213,12 +273,13 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => strtoupper($email),
                 'password' => $pass
             ),
+            'fail_uri' => ''
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'aauth/login/accept?auth-error=fail&email=test%40test.ru');
+        $this->assertResponseHeaderContains('Location', '?auth-error=fail&email=test%40test.ru');
 
         $this->getOdm()->clear();
 
@@ -238,13 +299,14 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => strtoupper($email),
                 'password' => $pass
             ),
-            'csrf' => $csrf
+            'csrf' => $csrf,
+            'fail_uri' => ''
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'aauth/login/accept?auth-error=fail&email=test');
+        $this->assertResponseHeaderContains('Location', '?auth-error=fail&email=test');
 
         $this->getOdm()->clear();
 
@@ -263,13 +325,14 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => $email,
                 'password' => $pass
             ),
-            'csrf' => $csrf
+            'csrf' => $csrf,
+            'fail_uri' => ''
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(301);
-        $this->assertResponseHeaderContains('Location', 'aauth/login/accept?auth-error=fail&email=test_not_have%40test.ru');
+        $this->assertResponseHeaderContains('Location', '?auth-error=fail&email=test_not_have%40test.ru');
 
         $this->getOdm()->clear();
 
@@ -289,10 +352,11 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => strtoupper($email),
                 'password' => $pass
             ),
-            'csrf' => $csrf
+            'csrf' => $csrf,
+            'success_uri' => ''
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(200);
 
@@ -316,6 +380,7 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
         );
 
         $csrf = $this->getLogin()->get('csrf')->getValue();
+        $uri = $this->getLogin()->get('success_uri')->getValue();
 
         $email = 'test2@test.ru';
         $pass = 'test2';
@@ -326,10 +391,11 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => strtoupper($email),
                 'password' => $pass
             ),
-            'csrf' => $csrf
+            'csrf' => $csrf,
+            'success_uri' => $uri
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(301);
         $this->assertResponseHeaderContains('Location', 'http://example.com');
@@ -352,6 +418,7 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
         );
 
         $csrf = $this->getLogin()->get('csrf')->getValue();
+        $uri = $this->getLogin()->get('success_uri')->getValue();
 
         $email = 'test2@test.ru';
         $pass = 'test2';
@@ -362,10 +429,11 @@ class AuthenticationControllerTest extends AbstractHttpControllerTestCase
                 'email' => strtoupper($email),
                 'password' => $pass
             ),
-            'csrf' => $csrf
+            'csrf' => $csrf,
+            'success_uri' => $uri
         );
 
-        $this->dispatch('aauth/login/accept', 'POST', $params);
+        $this->dispatch('/aauth/login/accept', 'POST', $params);
 
         $this->assertResponseStatusCode(301);
         $this->assertResponseHeaderContains('Location', 'testLogoutRedirectToRoute');

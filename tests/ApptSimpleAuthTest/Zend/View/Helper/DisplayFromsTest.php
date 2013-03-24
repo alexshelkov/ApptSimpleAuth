@@ -80,7 +80,7 @@ class DisplayFormsTest extends AbstractHttpControllerTestCase
 
         $content = $this->getResponse()->getContent();
 
-        $expectedContent = '<form action="aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value=""><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
+        $expectedContent = '<form action="/aauth/login/accept" method="post" name="login" id="login"><input name="user[email]" type="text" value=""><input name="user[password]" type="text" value=""><input name="submit" type="submit" value="Login"><input name="user[auth_error]" type="hidden" value="0"><input type="hidden" name="success_uri" value=""><input type="hidden" name="fail_uri" value="http:/"><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
 
         $this->assertContains($expectedContent, $content);
     }
@@ -93,7 +93,7 @@ class DisplayFormsTest extends AbstractHttpControllerTestCase
 
         $content = $this->getResponse()->getContent();
 
-        $expectedContent = '<form action="aauth/logout/accept" method="post" name="logout" id="logout"><input name="submit" type="submit" value="Logout"><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
+        $expectedContent = '<form action="/aauth/logout/accept" method="post" name="logout" id="logout"><input name="submit" type="submit" value="Logout"><input type="hidden" name="success_uri" value=""><input type="hidden" name="csrf" value="' . $csrf . '"></form>';
 
         $this->assertContains($expectedContent, $content);
     }

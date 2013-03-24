@@ -10,6 +10,9 @@ use ApptSimpleAuth\AclService;
 use ApptSimpleAuth\Acl;
 use SimpleAcl\RuleResultCollection;
 
+use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\RouteMatch;
+
 class AuthService
 {
     /**
@@ -156,5 +159,20 @@ class AuthService
         }
 
         return $isAllowed->get();
+    }
+
+    public function isAuthRoute(MvcEvent $event)
+    {
+        if ( ! $routeMatch = $event->getRouteMatch() ) {
+            return false;
+        }
+
+        $routeName = $routeMatch->getMatchedRouteName();
+
+        if ( in_array($routeName, array('aauth/login', 'aauth/logout')) ) {
+            return true;
+        }
+
+        return false;
     }
 }

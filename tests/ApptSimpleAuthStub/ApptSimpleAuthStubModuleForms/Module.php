@@ -47,6 +47,7 @@ class Module
             ),
             'view_manager' => array(
                 'template_map' => array(
+                    '404' => __DIR__ . '/view/appt-simple-auth-stub-module-forms/test/404.phtml',
                     'form/aauth/logout' => __DIR__ . '/view/appt-simple-auth-stub-module-forms/test/logout-form.phtml',
                     'form/aauth/login' => __DIR__ . '/view/appt-simple-auth-stub-module-forms/test/login-form.phtml',
                     'layout/layout' => __DIR__ . '/view/appt-simple-auth-stub-module-forms/test/layout.phtml',

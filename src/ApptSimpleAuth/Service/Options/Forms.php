@@ -31,12 +31,16 @@ class Forms extends AbstractOptions
      */
     protected $loginTemplate = 'form/aauth/login';
 
+    /**
+     * @var bool
+     */
+    protected $loginControllerDisplayEnable = false;
+
     protected function parseUrlOption($urlOption)
     {
         if ( is_array($urlOption) && isset($urlOption['route']) ) {
             $urlOption['params'] = (isset($urlOption['params']) && is_array($urlOption['params'])) ? $urlOption['params'] : array();
             $urlOption['options'] = (isset($urlOption['options']) && is_array($urlOption['options'])) ? $urlOption['options'] : array();
-            $urlOption['reuse_matched_params'] = isset($urlOption['reuse_matched_params']) ? $urlOption['reuse_matched_params'] : false;
             return $urlOption;
         } elseif ( is_string($urlOption) ) {
             return $urlOption;
@@ -71,6 +75,23 @@ class Forms extends AbstractOptions
     {
         $this->setLoginSuccessRedirectParams(isset($options['success_redirect_params']) ? $this->parseUrlOption($options['success_redirect_params']) : null);
         $this->setLoginTemplate(isset($options['template']) ? $options['template'] : $this->getLoginTemplate());
+        $this->setLoginControllerDisplayEnable(isset($options['controller_display_enable']) ? $options['controller_display_enable'] : $this->getLoginControllerDisplayEnable());
+    }
+
+    /**
+     * @param boolean $loginControllerDisplayEnable
+     */
+    public function setLoginControllerDisplayEnable($loginControllerDisplayEnable)
+    {
+        $this->loginControllerDisplayEnable = $loginControllerDisplayEnable;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getLoginControllerDisplayEnable()
+    {
+        return $this->loginControllerDisplayEnable;
     }
 
     /**

@@ -35,12 +35,10 @@ class AuthenticationController extends AbstractActionController
         return $this->getServiceLocator()->get('FormElementManager')->get('appt.simple_auth.form.logout');
     }
 
-    protected function redirectByParams($params)
+    protected function redirectByParams($uri)
     {
-        if ( is_array($params) ) {
-            return $this->redirect()->toRoute($params['route'], $params['params'], $params['options'], $params['reuse_matched_params']);
-        } elseif ( is_string($params) ) {
-            return $this->redirect()->toUrl($params);
+        if ( ! empty($uri) ) {
+            return $this->redirect()->toUrl($uri);
         }
 
         return false;
@@ -58,15 +56,19 @@ class AuthenticationController extends AbstractActionController
 
         // if not post just render form
         if ( ! $request->isPost() ) {
-            return $login->getViewModel();
+            if ( $login->isControllerDisplayEnable() ) {
+                return $login->getViewModel();
+            } else {
+                return $this->createHttpNotFoundModel($response);
+            }
         } else {
-
-            $login->setData($this->params()->fromPost());
-
+            $data = $this->params()->fromPost();
+            $data['user']['auth_error'] = 0;
+            $login->setData($data);
             $isValid = $login->isValid();
 
             if ( $isValid ) {
-                $params = $login->getSuccessRedirectParams();
+                $params = $login->getSuccessRedirectUri();
                 $message = "appt['simple_auth']['forms']['login']['success_redirect_params']";
             } else {
                 $params = $login->getFailRedirectUri();
@@ -77,8 +79,8 @@ class AuthenticationController extends AbstractActionController
                 $response->setStatusCode(Response::STATUS_CODE_301);
             } else {
                 $response->setStatusCode(Response::STATUS_CODE_200);
+                $response->setContent('Please setup ' . $message);
             }
-            $response->setContent('Please setup ' . $message);
 
         }
 
@@ -95,8 +97,7 @@ class AuthenticationController extends AbstractActionController
 
         // not do anything if not post request
         if ( ! $request->isPost() ) {
-            $response->setStatusCode(Response::STATUS_CODE_404);
-            return $response;
+            return $this->createHttpNotFoundModel($response);
         }
 
         $logout = $this->getLogout();
@@ -110,7 +111,7 @@ class AuthenticationController extends AbstractActionController
 
         $this->getAuth()->deAuthenticate();
 
-        if ( $this->redirectByParams($logout->getSuccessRedirectParams()) ) {
+        if ( $this->redirectByParams($logout->getSuccessRedirectUri()) ) {
             $response->setStatusCode(Response::STATUS_CODE_301);
         } else {
             $response->setStatusCode(Response::STATUS_CODE_200);

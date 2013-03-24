@@ -1,4 +1,5 @@
 <?php echo $this->form()->openTag($this->form); ?>
 <?php echo $this->formInput($this->form->get('submit')); ?>
+<?php echo $this->formHidden($this->form->get('success_uri')); ?>
 <?php echo $this->formHidden($this->form->get('csrf')); ?>
 <?php echo $this->form()->closeTag(); ?>

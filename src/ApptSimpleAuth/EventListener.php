@@ -160,7 +160,7 @@ class EventListener implements SharedListenerAggregateInterface, ListenerAggrega
         $auth = $event->getApplication()->getServiceManager()->get('appt.simple_auth.auth');
 
         try {
-            $isDenied = $object->isAuthDenied($auth, $event->getRouteMatch());
+            $isDenied = $object->isAuthDenied($auth, $event);
         } catch (AccessViolationException $isDenied) {}
 
         if ( $isDenied ) {

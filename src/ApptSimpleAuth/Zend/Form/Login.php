@@ -3,11 +3,13 @@ namespace ApptSimpleAuth\Zend\Form;
 
 use ApptSimpleAuth\Zend\Form\AbstractForm;
 use ApptSimpleAuth\Zend\Form\Fieldset\Validator\User;
+use Zend\Stdlib\ParametersInterface;
 use Zend\Stdlib\RequestInterface;
 use Zend\Http\Request as HttpRequest;
 use ApptSimpleAuth\Zend\Form\Fieldset\Validator\User as UserValidator;
 use ApptSimpleAuth\Zend\Form\Exception\DomainException;
 use ApptSimpleAuth\Zend\Form\Exception\RuntimeException;
+use Zend\Uri\Uri;
 
 class Login extends AbstractForm
 {
@@ -17,16 +19,27 @@ class Login extends AbstractForm
     protected $request;
 
     /**
-     * @var string
+     * @var bool
      */
-    protected $failRedirectUri;
+    protected $controllerDisplayEnable;
 
     /**
-     * @param $failRedirectUri
+     * @return boolean
      */
-    public function setFailRedirectUri($failRedirectUri)
+    public function isControllerDisplayEnable()
     {
-        $this->failRedirectUri = $failRedirectUri;
+        return $this->controllerDisplayEnable;
+    }
+
+    protected function getCurrentUri()
+    {
+        $request = $this->request;
+
+        if ( $request instanceof HttpRequest ) {
+            return $request->getUriString();
+        }
+
+        return '';
     }
 
     /**
@@ -38,7 +51,7 @@ class Login extends AbstractForm
     }
 
     /**
-     * Based on current requested URI generate fail URI by
+     * Based on forms requested URI generate fail URI by
      * adding auth-error and email as get params.
      *
      * @throws DomainException
@@ -46,36 +59,33 @@ class Login extends AbstractForm
      */
     public function getFailRedirectUri()
     {
-        if ( ! $this->failRedirectUri ) {
-            if ( ! $this->hasValidated ) {
-                throw new DomainException(sprintf(
-                    '%s cannot get redirect uri as validation has not yet occurred',
-                    __METHOD__
-                ));
-            }
-
-            $request = $this->getRequest();
-            if ( $request instanceof HttpRequest ) {
-
-                $data = $this->getData();
-
-                $params = array('auth-error' => UserValidator::FAIL);
-
-                if ( ! empty($data['user']['email']) ) {
-                    $params['email'] = $data['user']['email'];
-                }
-
-                $uri = $request->getUri();
-
-                $query = array_merge($uri->getQueryAsArray(), $params);
-
-                $uri->setQuery($query);
-
-                $this->failRedirectUri = $uri->toString();
-            }
+        if ( ! $this->hasValidated ) {
+            throw new DomainException(
+                __METHOD__ . ' cannot get redirect uri as validation has not yet occurred'
+            );
         }
 
-        return $this->failRedirectUri;
+        $data = $this->getData();
+
+        if ( ! isset($data['fail_uri']) ) {
+            throw new DomainException(
+                __METHOD__ . ' cannot get redirect uri as no uri in data'
+            );
+        }
+
+        $params = array('auth-error' => UserValidator::FAIL);
+
+        if ( ! empty($data['user']['email']) ) {
+            $params['email'] = $data['user']['email'];
+        }
+
+        $uri = new Uri($data['fail_uri']);
+
+        $query = array_merge($uri->getQueryAsArray(), $params);
+
+        $uri->setQuery($query);
+
+        return $uri->toString();
     }
 
     public function init()
@@ -85,6 +95,11 @@ class Login extends AbstractForm
         }
 
         parent::init();
+
+        $this->add(array(
+            'name' => 'fail_uri',
+            'type' => 'text'
+        ));
 
         // must be added as last form element
         $this->add(array(
@@ -97,13 +112,15 @@ class Login extends AbstractForm
         // users validator should be aware of input filter, so it can check if some
         // prev. validations failed and always be invalid in this case
         $user->getValidator()->setInputFilter($this->getInputFilter());
+        $user->get('auth_error')->setValue(0);
 
+        $this->get('fail_uri')->setValue($this->getCurrentUri());
         $this->get('submit')->setValue('Login');
     }
 
     public function __construct($name = null, $options = array())
     {
-        $this->injectDependencies(array('request'), $options);
+        $this->injectDependencies(array('request', 'controllerDisplayEnable' => 'controller_display_enable'), $options);
 
         if ( ! $this->request instanceof RequestInterface ) {
             throw new RuntimeException('Can\'t create ' . get_called_class() . ' without request');
@@ -119,25 +136,18 @@ class Login extends AbstractForm
             return $this->isValid;
         }
 
-        $request = $this->getRequest();
-
         if ( $this->isSetData() ) {
-            $data = array(
-                'csrf' => $this->get('csrf')->getValue(),
-                'user' => array(
-                    'auth_error' => $request->getQuery('auth-error')
-                )
-            );
+            /** @var ParametersInterface $query  */
+            $query= $this->getRequest()->getQuery();
 
-            if ( $request->getQuery()->offsetExists('email') ) {
-                $data['user']['email'] = $request->getQuery('email');
+            $data['csrf'] = $this->get('csrf')->getValue();
+            $data['user']['auth_error'] = $query['auth-error'];
+            if ( isset($query['email']) ) {
+                $data['user']['email'] = $query['email'];
             }
 
+            $data = array_merge_recursive($data, (array)$this->data);
             $this->setData($data);
-        } else {
-            if ( ! isset($this->data['user']['auth_error']) ) {
-                $this->data['user']['auth_error'] = 0;
-            }
         }
 
         return parent::isValid();
@@ -146,7 +156,7 @@ class Login extends AbstractForm
     protected function isSetData()
     {
         $request = $this->getRequest();
-        return $request instanceof HttpRequest && $request->getQuery()->offsetExists('auth-error') && ! $this->data;
+        return $request instanceof HttpRequest && $request->getQuery()->offsetExists('auth-error');
     }
 
     public function getViewModel()

@@ -8,6 +8,9 @@ use ApptSimpleAuth\ManagerService;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 
+use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\RouteMatch;
+
 class AuthServiceTest extends AbstractConsoleControllerTestCase
 {
     protected $traceError = true;
@@ -288,5 +291,31 @@ class AuthServiceTest extends AbstractConsoleControllerTestCase
 
         $this->assertEquals($user->getEmail(), $this->getAuth()->allowed($resource, $rule)->getEmail());
         $this->assertEquals($user->getEmail(), $this->getAuth()->allowed($resource2, $rule)->getEmail());
+    }
+
+    public function testIsAuthRoute()
+    {
+        $auth = $this->getAuth();
+
+        $event = new MvcEvent();
+        $this->assertFalse($auth->isAuthRoute($event));
+
+        $event = new MvcEvent();
+        $rm = new RouteMatch(array());
+        $event->setRouteMatch($rm);
+
+        $this->assertFalse($auth->isAuthRoute($event));
+
+        $event = new MvcEvent();
+        $rm = new RouteMatch(array());
+        $rm->setMatchedRouteName('aauth/login');
+        $event->setRouteMatch($rm);
+        $this->assertTrue($auth->isAuthRoute($event));
+
+        $event = new MvcEvent();
+        $rm = new RouteMatch(array());
+        $rm->setMatchedRouteName('aauth/logout');
+        $event->setRouteMatch($rm);
+        $this->assertTrue($auth->isAuthRoute($event));
     }
 }

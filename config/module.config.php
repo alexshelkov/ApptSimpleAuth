@@ -92,8 +92,9 @@ return array(
         'routes' => array(
             'aauth' => array(
                 'type' => 'Literal',
+                'priority' => 100,
                 'options' => array(
-                    'route' => 'aauth/'
+                    'route' => '/aauth/'
                 ),
                 'may_terminate' => false,
                 'child_routes' => array(

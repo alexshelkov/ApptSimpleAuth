@@ -2,15 +2,15 @@
 namespace ApptSimpleAuth\Feature;
 
 use ApptSimpleAuth\AuthService;
-use Zend\Mvc\Router\RouteMatch;
+use Zend\Mvc\MvcEvent;
 
 interface AuthControlInterface
 {
     /**
      * @param AuthService $auth
-     * @param RouteMatch $routeMatch
+     * @param MvcEvent $event
      *
      * @return bool | string
      */
-    public function isAuthDenied(AuthService $auth, RouteMatch $routeMatch);
+    public function isAuthDenied(AuthService $auth, MvcEvent $event);
 }
