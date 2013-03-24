@@ -17,7 +17,7 @@
         "php": ">=5.3.0",
         "zendframework/zendframework": "2.*",
         "alexshelkov/simpleacl": "2.*",
-        "doctrine/doctrine-mongo-odm-module": "dev-master",
+        "doctrine/doctrine-mongo-odm-module": "0.7.*",
         "symfony/yaml": "2.*"
     },
     "autoload": {
