@@ -61,7 +61,12 @@ abstract class AbstractForm extends Form
 
         $this->add(array(
             'name' => 'csrf',
-            'type' => 'Zend\Form\Element\Csrf'
+            'type' => 'Zend\Form\Element\Csrf',
+            'options' => array(
+                'csrf_options' => array(
+                    'timeout' => 86400
+                )
+            )
         ));
 
         $this->add(array(
