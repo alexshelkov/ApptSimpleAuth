@@ -2,6 +2,7 @@
 namespace ApptSimpleAuth\Zend\Form;
 
 use Zend\Form\Form;
+use Zend\Validator\Csrf as CsrfValidator;
 use Zend\View\Renderer\RendererInterface as Renderer;
 use Zend\View\Model\ViewModel;
 use ApptSimpleAuth\Zend\Form\Exception\RuntimeException;
@@ -62,12 +63,14 @@ abstract class AbstractForm extends Form
         $this->add(array(
             'name' => 'csrf',
             'type' => 'Zend\Form\Element\Csrf',
-            'options' => array(
-                'csrf_options' => array(
-                    'timeout' => 86400
-                )
-            )
         ));
+
+	    // each validator must have unique name
+	    // otherwise they may be in conflict
+	    $this->get('csrf')->setCsrfValidator(new CsrfValidator(array(
+		    'timeout' => 86400,
+		    'name'    => 'ApptSimpleAuth_' . $this->getName() . '_csrf'
+	    )));
 
         $this->add(array(
             'name' => 'success_uri',
