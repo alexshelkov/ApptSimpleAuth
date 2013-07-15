@@ -41,7 +41,7 @@ class Module implements
             'factories' => array(
                 'appt.simple_auth.form.logout' => 'ApptSimpleAuth\Service\Zend\Form\LogoutFactory',
                 'appt.simple_auth.form.login' => 'ApptSimpleAuth\Service\Zend\Form\LoginFactory',
-                'appt.simple_auth.form.fieldset.user' => 'ApptSimpleAuth\Service\Zend\Form\Fieldset\UserFactory'
+                'appt.simple_auth.form.fieldset.user' => 'ApptSimpleAuth\Service\Zend\Form\FieldSet\UserFactory'
             )
         );
     }
